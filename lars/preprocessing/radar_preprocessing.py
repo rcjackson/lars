@@ -83,6 +83,7 @@ def preprocess_radar_data(file_path, output_path,
             print(f"No sweep_0 found in {file}, skipping.")
     
     out_df.set_index('time', inplace=True)
+    out_df = out_df.sort_index()
     return out_df
 
 
