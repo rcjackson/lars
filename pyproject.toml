@@ -23,7 +23,7 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=6.0", "black", "flake8", "openai", "ollama", "xradar", "python-dotenv", "cmweather", "torchvision", "torch", "aiohttp"]
+dev = ["pytest>=6.0", "black", "flake8", "openai", "ollama", "xradar", "python-dotenv", "scikit-learn", "cmweather", "torchvision", "torch", "aiohttp"]
 
 [project.urls]
 Homepage = "https://github.com/rcjackson/lars"

@@ -1,4 +1,6 @@
 import asyncio
+import os
+
 DEFAULT_CATEGORIES = {"No precipitation": "No echoes greater than 10 dBZ present. A circle of echoes near radar site may be present due to ground clutter.",
                       "Stratiform rain": "Widespread echoes between 0 and 35 dBZ, not present as a circular pattern around the radar site.",
                       "Scattered Convection": "Present as isolated to scattered cells with reflectivities between 35-65 dBZ",
@@ -7,7 +9,7 @@ DEFAULT_CATEGORIES = {"No precipitation": "No echoes greater than 10 dBZ present
                       "Unknown": "If you cannot confidently classify the radar image into one of the above categories"}
 
 async def label_radar_data(radar_df, model, categories=None, site="Bankhead National Forest",
-                           verbose=True, vmin=-20, vmax=60):
+                           verbose=True, vmin=-20, vmax=60, model_output_dir=None):
     """
     Label radar data using a given model.
 
@@ -16,6 +18,7 @@ async def label_radar_data(radar_df, model, categories=None, site="Bankhead Nati
     radar_df (pd.DataFrame): DataFrame containing radar data to be labeled.
     model: Model used for labeling the radar data.
     site: str: Radar site identifier.
+    model_output_dir: str: Directory to save model outputs.
 
     Returns
     -------
@@ -37,18 +40,25 @@ async def label_radar_data(radar_df, model, categories=None, site="Bankhead Nati
     for fi in radar_df["file_path"].values:
         time = radar_df.loc[radar_df["file_path"] == fi, "time"].values[0]
         prompt_with_time = prompt + f"Please provide just the category label for the radar image taken at time {time}."      
-        
+        prompt_with_time = prompt_with_time + "Do not provide your reasoning for your selection, just the category."
 
         output_model = await model.chat(prompt_with_time, images=[fi])
         # Find the category label in the output
-        output = output_model.strip()
+        output_model = output_model.strip()
+        output = "Unknown"
         for category in categories.keys():
-            if category.lower() in output.lower():
+            output_lower = output_model.lower()
+            last_line = output_lower.split("\n")[-1].strip().lower()
+            if category.lower() in last_line:
                 output = category
                 break
         if verbose:
              print("Category assigned:", output)
              print("Model output:", output_model)
+        if model_output_dir is not None:
+            output_file = f"{model_output_dir}/{os.path.basename(fi).replace('.png', '_llm_output.txt')}"
+            with open(output_file, "w") as f:
+                f.write(output_model)
         if output[-1] == ".":
             output = output[:-1]
         radar_df.loc[radar_df["file_path"] == fi, "llm_label"] = output.strip()
