@@ -1,8 +1,13 @@
 import asyncio
-DEFAULT_CATEGORIES = ["NO PRECIPITATION", "STRATIFORM RAIN", "SNOW", "SCATTERED CONVECTION",
-                      "LINEAR CONVECTION", "SUPERCELLS", "UNKNOWN"]
+DEFAULT_CATEGORIES = {"No precipitation": "No echoes greater than 10 dBZ present. A circle of echoes near radar site may be present due to ground clutter.",
+                      "Stratiform rain": "Widespread echoes between 0 and 35 dBZ, not present as a circular pattern around the radar site.",
+                      "Scattered Convection": "Present as isolated to scattered cells with reflectivities between 35-65 dBZ",
+                      "Linear convection": "Cells must be organized into a linear structure with reflectivities between 40-60 dBZ",
+                      "Supercells": "Supercells contain the classic hook echo and bounded weak echo region signatures with reflectivities above 55 dBZ",
+                      "Unknown": "If you cannot confidently classify the radar image into one of the above categories"}
 
-async def label_radar_data(radar_df, model, categories=None):
+async def label_radar_data(radar_df, model, categories=None, site="Bankhead National Forest",
+                           verbose=True, vmin=-20, vmax=60):
     """
     Label radar data using a given model.
 
@@ -10,17 +15,43 @@ async def label_radar_data(radar_df, model, categories=None):
     ----------
     radar_df (pd.DataFrame): DataFrame containing radar data to be labeled.
     model: Model used for labeling the radar data.
+    site: str: Radar site identifier.
 
     Returns
     -------
     pd.DataFrame
         DataFrame containing the labeled radar data.
     """
+    if categories is None:
+        categories = DEFAULT_CATEGORIES
     prompt = "This is an image of weather radar base reflectivity data." \
+                f" The radar site is the ARM Facility {site} site." \
              " Please classify the weather depicted into one of the following categories: " \
-             f"{', '.join(categories) if categories else ', '.join(DEFAULT_CATEGORIES)}."
+             f"{', '.join(categories) if categories else ', '.join(categories)}."
+    prompt += "Each category is defined as follows: "
+    for category, description in categories.items():
+        prompt += f"{category}: {description}; "
+    prompt += f"The reflectivity values range from {vmin} dBZ as indicated by the blue colors to {vmax} dBZ as indicated by the red colors."
+    radar_df["llm_label"] = ""
+
     for fi in radar_df["file_path"].values:
-        output = await model.chat(prompt, images=[fi])
-        print(output)
-        radar_df.loc[radar_df["file_path"] == fi, "label"] = output
+        time = radar_df.loc[radar_df["file_path"] == fi, "time"].values[0]
+        prompt_with_time = prompt + f"Please provide just the category label for the radar image taken at time {time}."      
+        
+
+        output_model = await model.chat(prompt_with_time, images=[fi])
+        # Find the category label in the output
+        output = output_model.strip()
+        for category in categories.keys():
+            if category.lower() in output.lower():
+                output = category
+                break
+        if verbose:
+             print("Category assigned:", output)
+             print("Model output:", output_model)
+        if output[-1] == ".":
+            output = output[:-1]
+        radar_df.loc[radar_df["file_path"] == fi, "llm_label"] = output.strip()
+        
+        
     return radar_df

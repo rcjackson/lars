@@ -35,7 +35,7 @@ def preprocess_radar_data(file_path, output_path,
     """
     
     file_list = glob.glob(file_path + '/*.nc')
-    out_df = pd.DataFrame(columns=['file_path', 'time', 'label'])
+    out_df = pd.DataFrame(columns=['file_path', 'time', 'label', 'ref_min', 'ref_max'])
     if not "vmin" in kwargs:
         kwargs['vmin'] = -20
     if not "vmax" in kwargs:
@@ -57,16 +57,21 @@ def preprocess_radar_data(file_path, output_path,
             if sweep["sweep_mode"] == 'ppi' or sweep["sweep_mode"] == 'sector':
                 fig = plt.figure(figsize=(4, 4))
                 ax = plt.axes()
-                sweep["corrected_reflectivity"].plot(x="x", y="y", 
-                                                     add_colorbar=False, 
-                                                     ax=ax, 
-                                                     **kwargs)
+                sweep["corrected_reflectivity"].where(
+                        sweep["corrected_reflectivity"] > min_ref).plot(x="x", y="y",
+                                                                        ax=ax,
+                                                                        **kwargs)
+                min_ref = sweep["corrected_reflectivity"].where(
+                            sweep["corrected_reflectivity"] > min_ref).values.min()
+                max_ref = sweep["corrected_reflectivity"].where(
+                            sweep["corrected_reflectivity"] > min_ref).values.max()
+
                 ax.set_xlim(x_bounds)
                 ax.set_ylim(y_bounds)
-                ax.axis('off')
-                ax.set_title('')
-                ax.set_xlabel('')
-                ax.set_ylabel('')
+                ax.set_xlabel('X [m]')
+                ax.set_ylabel('Y [m]')
+                ax.set_xticks([-100000, -50000, 0, 50000, 100000])
+                ax.set_yticks([-100000, -50000, 0, 50000, 100000])
                 fig.tight_layout()
                 file_name = os.path.join(output_path,
                                          os.path.basename(file).replace('.nc', '.png'))
@@ -74,9 +79,10 @@ def preprocess_radar_data(file_path, output_path,
                 label = "UNKNOWN"   # Placeholder for actual label extraction logic
                 fig.savefig(os.path.join(output_path,
                                          os.path.basename(file).replace('.nc', '.png')),
-                            dpi=100)
+                            dpi=150)
                 plt.close(fig)
-                out_df.loc[len(out_df)] = [file_name, time_str, label]
+                out_df.loc[len(out_df)] = [file_name, time_str, label, min_ref, max_ref]
+
             else:
                 print(f"Sweep mode is not PPI or sector scan in {file}, skipping.")
         else:

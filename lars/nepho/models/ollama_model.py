@@ -63,14 +63,22 @@ class OllamaModel(BaseModel):
                     
                     image_data = self.encode_image(image_path)
                     images_data.append(image_data)
-                
+                #if self.model_name == "llama4:scout":
+                #    payload = {
+                #        "model": self.model_name,
+                #        "messages": [
+                #            {"role": "user", "content": prompt, "images": images_data}
+                #    ],
+                #    "stream": False
+                #}
+                #else:    
                 payload = {
-                    "model": self.model_name,
-                    "prompt": prompt,
-                    "images": images_data,
-                    "stream": False
+                        "model": self.model_name,
+                        "prompt": prompt,
+                        "images": images_data,
+                        "stream": False
                 }
-                
+
                 # Use generate endpoint for vision models
                 url = self.api_url
             else:
@@ -107,7 +115,7 @@ class OllamaModel(BaseModel):
     
     def supports_vision(self) -> bool:
         """Check if this model supports vision capabilities."""
-        vision_models = ["llava", "bakllava", "moondream", "minicpm-v", "llava-llama2", "llava-llama3"]
+        vision_models = ["llava", "bakllava", "moondream", "minicpm-v", "llava-llama2", "llava-llama3", "llama4:scout"]
         return any(vision_model in self.model_name.lower() for vision_model in vision_models)
     
     async def list_available_models(self) -> List[str]:
