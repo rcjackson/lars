@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "lars"
 version = "0.1.0"
-description = "A brief description of the project"
+description = "LLM-Assisted Radar Scene classification"
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [
     {name = "Robert Jackson", email = "rjackson@anl.gov"},
-    {name = "Le Chen", email = "le.chen@anl.gov",
+    {name = "Le Chen", email = "le.chen@anl.gov"},
     {name = "Seongha Park", email = "seongha.park@anl.gov"}
 ]
 license = {text = "MIT"}
@@ -23,7 +23,7 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=6.0", "black", "flake8", "openai", "ollama", "xradar", "python-dotenv", "scikit-learn", "cmweather", "torchvision", "torch", "aiohttp"]
+dev = ["pytest>=6.0", "black", "flake8", "openai", "xradar", "python-dotenv", "scikit-learn", "cmweather", "torchvision", "torch", "aiohttp", "matplotlib", "pandas"]
 
 [project.urls]
 Homepage = "https://github.com/rcjackson/lars"
