@@ -55,7 +55,7 @@ def preprocess_radar_data(file_path, output_path,
         if 'sweep_0' in radar:
             sweep = radar['sweep_0']
             if sweep["sweep_mode"] == 'ppi' or sweep["sweep_mode"] == 'sector':
-                fig = plt.figure(figsize=(4, 4))
+                fig = plt.figure(figsize=(256/150, 256/150))
                 ax = plt.axes()
                 sweep["corrected_reflectivity"].where(
                         sweep["corrected_reflectivity"] > min_ref).plot(x="x", y="y",
