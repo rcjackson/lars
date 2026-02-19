@@ -1,6 +1,6 @@
 # LLM-Assisted Radar Scene classification (LARS)
 
-This model uses a hybrid approach between mLLMs and Deep Learning CV models to 
+LARS uses a hybrid approach between multimodal LLMs (mLLMs) and deep learning computer vision models for radar scene classification.
 
 LARS is based around Nepho, a parallel-mLLM chatbot interface designed by @thelechen to quickly prompt images to mLLMs using parallelism. LARS will consist of two portions:
 

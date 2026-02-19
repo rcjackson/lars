@@ -20,8 +20,8 @@ The purpose of this section is to label radar imagery for warm-season precipitat
 ### 2.1 Input Fields
 
 | Field | Units | Description |
-|-------|-------|-------------|
-| Reflectivity (Z) | dBZ | Intensity of returned radar signal |
+|--------------------------|-------|-------------------------------------|
+| *corrected_reflectivity* | dBZ | Intensity of returned radar signal |
 
 
 ### 2.2 Image Format
@@ -29,7 +29,7 @@ The purpose of this section is to label radar imagery for warm-season precipitat
 - **Spatial resolution:** 1 km by 1 km
 - **Temporal resolution:** 10-minute intervals
 - **Projection:** Polar coordinates projected onto 
-- **Color scale:** (describe or attach scale reference)
+- **Color scale:** HomeyerRainbow colormap with vmin=-10 and vmax=60 dBZ
 
 ---
 
