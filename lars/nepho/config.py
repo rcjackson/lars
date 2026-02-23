@@ -26,4 +26,8 @@ class Config:
     MAX_CONCURRENT_MODELS: int = int(os.getenv("MAX_CONCURRENT_MODELS", "3"))
     REQUEST_TIMEOUT: int = int(os.getenv("REQUEST_TIMEOUT", "60"))
 
+    DEFAULT_ASK_SAGE_USER_URL = "https://api.asksage.anl.gov/user"
+    DEFAULT_ASK_SAGE_SERVER_URL = "https://api.asksage.anl.gov/server"
+    
+
 config = Config()
