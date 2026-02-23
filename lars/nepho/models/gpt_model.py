@@ -34,7 +34,7 @@ class GPTModel(BaseModel):
                     content.append({
                         "type": "image_url",
                         "image_url": {
-                            "url": f"data:image/jpeg;base64,{image_data}"
+                            "url": f"data:image/png;base64,{image_data}"
                         }
                     })
                 
@@ -62,4 +62,5 @@ class GPTModel(BaseModel):
     
     def supports_vision(self) -> bool:
         """Check if this model supports vision capabilities."""
-        return "vision" in self.model_name.lower() or "gpt-4" in self.model_name.lower()
+        return "vision" in self.model_name.lower() or "gpt-4" in self.model_name.lower() or "gpt-5" in self.model_name.lower()
+    
