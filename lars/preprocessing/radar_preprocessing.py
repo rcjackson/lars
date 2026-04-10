@@ -19,7 +19,7 @@ def preprocess_radar_data(file_path, output_path, date=None,
     file_path (str): Path to the radar data files.
 
     output_path (str): Path to save the processed .png images.
-    date (str): Optional date string to filter radar files, in the format 'YYYYMMDD'.
+    date (str or list): Optional date string to filter radar files, in the format 'YYYYMMDD'.
     radar_field (str): The radar field to be processed, 
         default is 'corrected_reflectivity'.
     x_bounds (tuple): The x-axis bounds for plotting in meters.
@@ -37,7 +37,10 @@ def preprocess_radar_data(file_path, output_path, date=None,
     
     file_list = glob.glob(file_path + '/*.nc')
     if date is not None:
-        file_list = [f for f in file_list if date in f]
+        if isinstance(date, str):
+            date = [date]
+        for date_str in date:
+            file_list = [f for f in file_list if date_str in f]
     out_df = pd.DataFrame(columns=['file_path', 'time', 'label', 'ref_min', 'ref_max'])
     if not "vmin" in kwargs:
         kwargs['vmin'] = -20
