@@ -39,8 +39,10 @@ def preprocess_radar_data(file_path, output_path, date=None,
     if date is not None:
         if isinstance(date, str):
             date = [date]
+        file_list2 = []
         for date_str in date:
-            file_list = [f for f in file_list if date_str in f]
+            file_list2 = file_list2 + [f for f in file_list if date_str in f]
+        file_list = file_list2
     out_df = pd.DataFrame(columns=['file_path', 'time', 'label', 'ref_min', 'ref_max'])
     if not "vmin" in kwargs:
         kwargs['vmin'] = -20
