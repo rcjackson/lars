@@ -8,8 +8,6 @@ for _mod in [
     "xradar",
     "cmweather",
     "pip_system_certs",
-    "torch",
-    "torchvision",
 ]:
     sys.modules[_mod] = MagicMock()
 
