@@ -1,5 +1,9 @@
 import sys
+import matplotlib
+import matplotlib.pyplot as plt
 from unittest.mock import MagicMock
+
+matplotlib.use("Agg")
 
 # Mock packages not available in CI (private or heavy scientific deps)
 for _mod in [
@@ -7,10 +11,9 @@ for _mod in [
     "xradar",
     "cmweather",
     "pip_system_certs",
-    "sklearn",
-    "sklearn.metrics",
-    "sklearn.preprocessing",
     "torch",
     "torchvision",
 ]:
     sys.modules[_mod] = MagicMock()
+
+plt.close("all")
