@@ -30,4 +30,5 @@ jobs:
       - name: Run tests
         env:
           OPENAI_API_KEY: "test-key-not-real"
+          MPLBACKEND: Agg
         run: pytest tests/ -v
