@@ -29,3 +29,6 @@ dev = ["pytest>=6.0", "black", "flake8", "openai", "xradar", "python-dotenv",
 
 [project.urls]
 Homepage = "https://github.com/rcjackson/lars"
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
