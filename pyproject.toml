@@ -31,4 +31,4 @@ dev = ["pytest>=6.0", "pytest-asyncio>=0.21", "black", "flake8", "openai", "xrad
 Homepage = "https://github.com/rcjackson/lars"
 
 [tool.pytest.ini_options]
-asyncio_mode = "auto"
+asyncio_mode = "strict"
