@@ -1,9 +1,10 @@
 import xradar as xd
 import matplotlib.pyplot as plt
 import glob
+import numpy as np
 import os
 import pandas as pd
-import cmweather    # noqa 
+import cmweather    # noqa
 
 
 def preprocess_radar_data(file_path, output_path, date=None,
@@ -66,7 +67,8 @@ def preprocess_radar_data(file_path, output_path, date=None,
         radar = radar.xradar.georeference()
         if 'sweep_0' in radar:
             sweep = radar['sweep_0']
-            if sweep["sweep_mode"] == 'ppi' or sweep["sweep_mode"] == 'sector':
+            sweep_mode = str(sweep["sweep_mode"].values).split('\x00')[0].strip()
+            if sweep_mode in ('ppi', 'sector', 'azimuth_surveillance'):
                 fig = plt.figure(figsize=(size_px/dpi, size_px/dpi))
                 ax = plt.axes()
                 sweep["corrected_reflectivity"].where(
@@ -74,11 +76,14 @@ def preprocess_radar_data(file_path, output_path, date=None,
                                                                         ax=ax,
                                                                         add_colorbar=False,
                                                                         **kwargs)
-                min_ref = sweep["corrected_reflectivity"].where(
-                            sweep["corrected_reflectivity"] > min_ref).values.min()
-                max_ref = sweep["corrected_reflectivity"].where(
-                            sweep["corrected_reflectivity"] > min_ref).values.max()
-
+                masked = sweep["corrected_reflectivity"].where(
+                            sweep["corrected_reflectivity"] > min_ref).values
+                ref_min = np.nanmin(masked)
+                ref_max = np.nanmax(masked)
+                ax.axis('off')
+                ax.set_title('')
+                ax.set_ylabel('')
+                ax.set_xlabel('')
                 ax.set_xlim(x_bounds)
                 ax.set_ylim(y_bounds)
                 
@@ -91,7 +96,7 @@ def preprocess_radar_data(file_path, output_path, date=None,
                                          os.path.basename(file).replace('.nc', '.png')),
                             dpi=dpi, bbox_inches='tight', pad_inches=0)
                 plt.close(fig)
-                out_df.loc[len(out_df)] = [file_name, time_str, label, min_ref, max_ref]
+                out_df.loc[len(out_df)] = [file_name, time_str, label, ref_min, ref_max]
 
             else:
                 print(f"Sweep mode is not PPI or sector scan in {file}, skipping.")
