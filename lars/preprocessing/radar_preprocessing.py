@@ -48,7 +48,9 @@ def preprocess_radar_data(file_path, output_path, date=None,
         for date_str in date:
             file_list2.extend([f for f in file_list if date_str in f])
         file_list = file_list2
-    out_df = pd.DataFrame(columns=['file_path', 'time', 'label', 'ref_min', 'ref_max'])
+    dbz_thresholds = [10, 20, 30, 40, 50]
+    gate_cols = [f'n_gates_{t}dbz' for t in dbz_thresholds]
+    out_df = pd.DataFrame(columns=['file_path', 'time', 'label', 'ref_min', 'ref_max'] + gate_cols)
     if not "vmin" in kwargs:
         kwargs['vmin'] = -20
     if not "vmax" in kwargs:
@@ -80,6 +82,7 @@ def preprocess_radar_data(file_path, output_path, date=None,
                             sweep[radar_field] > min_ref).values
                 ref_min = np.nanmin(masked)
                 ref_max = np.nanmax(masked)
+                gate_counts = [int(np.sum(masked > t)) for t in dbz_thresholds]
                 ax.axis('off')
                 ax.set_title('')
                 ax.set_ylabel('')
@@ -96,7 +99,7 @@ def preprocess_radar_data(file_path, output_path, date=None,
                                          os.path.basename(file).replace('.nc', '.png')),
                             dpi=dpi, bbox_inches='tight', pad_inches=0)
                 plt.close(fig)
-                out_df.loc[len(out_df)] = [file_name, time_str, label, ref_min, ref_max]
+                out_df.loc[len(out_df)] = [file_name, time_str, label, ref_min, ref_max] + gate_counts
 
             else:
                 print(f"Sweep mode is not PPI or sector scan in {file}, skipping.")
